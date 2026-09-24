@@ -232,8 +232,10 @@ int main() {
 		ccsMatrix.print();
 		std::cout << std::endl;
 
-		std::cin.get();
+		
 		std::cout << "Press Enter to continue...\n";
 		std::cin.get();
+		std::cin.get();
+		system("cls");
 	}
 }
