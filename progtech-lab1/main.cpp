@@ -13,6 +13,9 @@ class CCSMatrix {
 
 private:
 	int calcRowSum(int row) {
+		// Функция, которая возвращает сумму значений строки. 
+		// Аргумент:
+		// row - номер строки.
 		int sum = 0;
 		for (int i = 0; i < rowIndexes.size(); i++) {
 			if (rowIndexes[i] == row) {
@@ -23,6 +26,10 @@ private:
 	}
 
 	void swapRows(int row1, int row2) {
+		// Функция, меняющая местами две строки.
+		// Аргументы:
+		// row1: индекс первой строки
+		// row2: индекс второй строки
 		std::vector<int> tempRow1;
 		for (int i = 0; i < rowIndexes.size(); i++) {
 			if (rowIndexes[i] == row1) {
@@ -49,7 +56,11 @@ private:
 public:
 
 	CCSMatrix(int** matrix, int rows, int cols): rows(rows), cols(cols) {
-	// Упаковка матрицы в формат CCS
+		// Упаковка матрицы в формат CCS
+		// Аргументы:
+		// int** matrix: неупакованная матрица
+		// int rows: количество строк
+		// int cols: количество столбцов
 		colPointers.resize(cols + 1, 0);
 		for (int curCol = 0; curCol < cols; curCol++) {
 			for (int curRow = 0; curRow < rows; curRow++) {
@@ -65,7 +76,31 @@ public:
 	~CCSMatrix() {
 	}
 
+	void printPacked() {
+		// Функция, выводящая в консоль матрицу в упакованном формате
+		std::cout << std::left;
+		std::cout << std::setw(20) << "Values: ";
+		for (int x : values) {
+			std::cout << std::setw(4) << x;
+		}
+		std::cout << std::endl;
+		std::cout << std::setw(20) << "RowIndexes: ";
+		for (int x : rowIndexes) {
+			std::cout << std::setw(4) << x;
+		}
+		std::cout << std::endl;
+		std::cout << std::setw(20) << "ColumnPointers: ";
+		for (int x : colPointers) {
+			std::cout << std::setw(4) << x;
+		}
+		std::cout << std::endl;
+		std::cout << std::right;
+
+		std::cout << std::endl;
+	}
+
 	void print() {
+		// Функция, выводящая в консоль матрицу в привычном формате
 		std::cout << std::left;
 		for (int rowId = 0; rowId < rows; rowId++) {
 			for (int colId = 0; colId < cols; colId++) {
@@ -92,8 +127,9 @@ public:
 	}
 
 	void sort() {
+		// Функция сортировки матрицы.
 		for (int i = 0; i < rows; i++) {
-			int smallestRow = -1;
+			int smallestRow = i;
 
 			int minSum = calcRowSum(i);
 			int curSum;
@@ -137,6 +173,9 @@ int main() {
 
 	CCSMatrix* ccsMatrix = new CCSMatrix(matrix, 3, 3);
 	ccsMatrix->print();
+	std::cout << '\n';
+	ccsMatrix->printPacked();
 	ccsMatrix->sort();
+	std::cout << '\n';
 	ccsMatrix->print();
 }
