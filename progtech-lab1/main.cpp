@@ -70,9 +70,41 @@ private:
 	}
 
 public:
+	CCSMatrix(std::istream& input) {
+		// Конструктор матрицы из потока
+		// Аргументы:
+		// std::istream& input: поток, откуда будет читаться матрица
 
-	CCSMatrix(const std::vector<std::vector<int>>& matrix, int rows, int cols): rows(rows), cols(cols) {
-		packMatrix(matrix);
+		input >> rows;
+		input >> cols;
+
+		colPointers.resize(cols + 1, 0);
+
+		std::vector<std::vector<int>> tempValues(cols);
+		std::vector<std::vector<int>> tempRows(cols);
+
+
+		for (int row = 0; row < rows; row++) {
+			for (int col = 0; col < cols; col++) {
+				int value;
+
+				input >> value;
+
+				if (value != 0) {
+					tempValues[col].push_back(value);
+					tempRows[col].push_back(row);
+				}
+			}
+		}
+
+		for (int col = 0; col < cols; col++) {
+			for (int i = 0; i < tempValues[col].size(); i++) {
+				values.push_back(tempValues[col][i]);
+				rowIndexes.push_back(tempRows[col][i]);
+			}
+
+			colPointers[col + 1] = values.size();
+		}
 	}
 
 	void printPacked() {
@@ -146,96 +178,52 @@ public:
 
 };
 
-std::vector<std::vector<int>> readMatrixFromConsole(int rows, int cols) {
-	// Функция, которая читает матрицу из файла.
-	// Аргументы:
-	// int rows: количество строк
-	// int cols: количество столбцов
-	std::vector<std::vector<int>> matrix = std::vector<std::vector<int>>(rows, std::vector<int>(cols));
-	for (int i = 0; i < rows; i++) {
-		for (int j = 0; j < cols; j++) {
-			std::cin >> matrix[i][j];
-		}
-	}
-	return matrix;
-}
-
-std::vector<std::vector<int>> readMatrixFromFile(const std::string& filename) {
-	// Функция, которая читает матрицу из файла.
-	// Аргументы:
-	// const std::string& filename: название файла
-	std::ifstream file(filename);
-	int rows;
-	int cols;
-
-	if (!file.is_open()) {
-		throw std::runtime_error("Can't open the file");
-	}
-
-	file >> rows;
-	file >> cols;
-
-	std::vector<std::vector<int>> matrix(rows, std::vector<int>(cols));
-
-	for (int i = 0; i < rows; i++) {
-		for (int j = 0; j < cols; j++) {
-			file >> matrix[i][j];
-		}
-	}
-
-	return matrix;
-}
 
 int main() {
 	while (true) {
 		std::cout << "Where do I get the matrix? \n1 - console\n2 - file\n0 - exit\n\nEnter: ";
 		int switchValue;
 		std::cin >> switchValue;
-		std::vector<std::vector<int>> matrix;
+		CCSMatrix* ccsMatrix = nullptr;
 		switch (switchValue) {
 			case 1: 
 			{
-				int rows;
-				int cols;
-				std::cout << "Enter the number of rows and columns: ";
-				std::cin >> rows;
-				std::cin >> cols;
-				matrix = readMatrixFromConsole(rows, cols);
+				std::cout << "Enter the matrix: ";
+				ccsMatrix = new CCSMatrix(std::cin);
 				break;
 			}
 			case 2: {
 				std::string filename;
 				std::cout << "Enter the filename: ";
 				std::cin >> filename;
-				matrix = readMatrixFromFile(filename);
+				std::ifstream file(filename);
+				ccsMatrix = new CCSMatrix(file);
+				file.close();
 				break;
 			}
-			case 0: {
+			default: {
 				return 0;
 			}
 		}
-		int rows = matrix.size();
-		int cols = matrix[0].size();
 
-		CCSMatrix ccsMatrix = CCSMatrix(matrix, rows, cols);
-		matrix.clear();
-		matrix.shrink_to_fit();
 
 		std::cout << "\nUnpacked matrix: \n";
-		ccsMatrix.print();
+		ccsMatrix->print();
 		std::cout << std::endl;
 		std::cout << "Packed matrix: \n";
-		ccsMatrix.printPacked();
+		ccsMatrix->printPacked();
 		std::cout << std::endl;
-		ccsMatrix.sort();
+		ccsMatrix->sort();
 		std::cout << "\nUnpacked sorted matrix: \n";
-		ccsMatrix.print();
+		ccsMatrix->print();
 		std::cout << std::endl;
 
 		
 		std::cout << "Press Enter to continue...\n";
 		std::cin.get();
 		std::cin.get();
+
+		delete ccsMatrix;
 		system("cls");
 	}
 }
