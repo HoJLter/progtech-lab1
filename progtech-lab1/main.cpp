@@ -53,21 +53,6 @@ private:
 		std::cout << "Swapped: " << row1 << ", " << row2 << std::endl;
 #endif
 	}
-	void packMatrix(const std::vector<std::vector<int>>& matrix) {
-		// Упаковка матрицы в формат CCS
-		// Аргументы:
-		// const std::vector<std::vector<int>>&: неупакованная матрица
-		colPointers.resize(cols + 1, 0);
-		for (int curCol = 0; curCol < cols; curCol++) {
-			for (int curRow = 0; curRow < rows; curRow++) {
-				if (matrix[curRow][curCol] != 0) {
-					values.push_back(matrix[curRow][curCol]);
-					rowIndexes.push_back(curRow);
-				}
-			}
-			colPointers[curCol + 1] = values.size();
-		}
-	}
 
 public:
 	CCSMatrix(std::istream& input) {
@@ -83,7 +68,7 @@ public:
 		std::vector<std::vector<int>> tempValues(cols);
 		std::vector<std::vector<int>> tempRows(cols);
 
-
+		// Собираем все ненулевые значения из матрицы
 		for (int row = 0; row < rows; row++) {
 			for (int col = 0; col < cols; col++) {
 				int value;
